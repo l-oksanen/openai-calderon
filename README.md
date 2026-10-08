@@ -1,4 +1,4 @@
-# openai-calderon
+# Anisotropic Calderón problem: comparator challenge  
 
 Comparator challenge for the main theorem of *Smooth anisotropic uniqueness in the
 Calderón problem from one boundary patch* (OpenAI, September 24, 2026), specialized to
@@ -7,8 +7,3 @@ ball.
 
 - Statement: `ComparatorChallenges/AnisotropicCalderon.lean`
 - Comparator config: `ComparatorChallenges/AnisotropicCalderon.json`
-
-```sh
-lake exe cache get
-lake build
-```
