@@ -56,7 +56,7 @@ def energy (g : MatrixField) (u : R3 → ℝ) : ℝ :=
   ∫ x in B, (∑ i, ∑ j, (g x)⁻¹ i j * d u x i * d u x j) * vol g x
 
 /-- Minimal Dirichlet energy with boundary value `f|_{∂B}`, i.e. `⟨Λ_g f, f⟩`. -/
-def dirichletEnergy (g : MatrixField) (f : R3 → ℝ) : ℝ :=
+def minimalEnergy (g : MatrixField) (f : R3 → ℝ) : ℝ :=
   sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ B })
 
 /-- Main theorem: equal Dirichlet-to-Neumann data on the whole boundary implies that
@@ -66,7 +66,7 @@ with the identity to infinite order at `∂B`, so it extends by the identity to 
 diffeomorphism of `ℝ³`. -/
 theorem main (g₁ g₂ : MatrixField)
     (hg₁ : IsAdmissibleMetric g₁) (hg₂ : IsAdmissibleMetric g₂)
-    (hΛ : ∀ f : R3 → ℝ, ContDiff ℝ ∞ f → dirichletEnergy g₁ f = dirichletEnergy g₂ f) :
+    (hΛ : ∀ f : R3 → ℝ, ContDiff ℝ ∞ f → minimalEnergy g₁ f = minimalEnergy g₂ f) :
     ∃ Φ : R3 ≃ R3,
       ContDiff ℝ ∞ Φ ∧ ContDiff ℝ ∞ Φ.symm ∧
       (∀ x : R3, 1 ≤ ‖x‖ → Φ x = x) ∧
