@@ -40,21 +40,6 @@ def d (u : R3 → ℝ) (x : R3) : Fin 3 → ℝ :=
 def D (Φ : R3 → R3) : MatrixField :=
   fun x => Matrix.of fun i j => fderiv ℝ Φ x (EuclideanSpace.single j 1) i
 
-/-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
-outside the open unit ball. -/
-structure IsAdmissibleMetric (g : MatrixField) : Prop where
-  smooth : ∀ i j, ContDiff ℝ ∞ fun x => g x i j
-  posDef : ∀ x, (g x).PosDef
-  euclidean_exterior : ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
-
-/-- `Φ` is a diffeomorphism of `ℝ³` that is the identity outside the open unit ball
-and pulls `g₁` back to `g₂`, i.e. `g₂ = Φ^* g₁`. -/
-structure IsIsometryFixingExterior (Φ : R3 ≃ R3) (g₁ g₂ : MatrixField) : Prop where
-  smooth : ContDiff ℝ ∞ Φ
-  smooth_symm : ContDiff ℝ ∞ Φ.symm
-  fixes_exterior : ∀ x : R3, 1 ≤ ‖x‖ → Φ x = x
-  pullback : ∀ x : R3, g₂ x = (D Φ x).transpose * g₁ (Φ x) * D Φ x
-
 /-- Riemannian volume density `V = √(det g)`. -/
 def vol (g : MatrixField) (x : R3) : ℝ :=
   Real.sqrt (g x).det
@@ -66,6 +51,21 @@ def energy (g : MatrixField) (u : R3 → ℝ) : ℝ :=
 /-- Minimal Dirichlet energy with boundary value `f|_{∂B}`, i.e. `⟨Λ_g f, f⟩`. -/
 def minimalEnergy (g : MatrixField) (f : R3 → ℝ) : ℝ :=
   sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ B })
+
+/-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
+outside the open unit ball. -/
+structure IsAdmissibleMetric (g : MatrixField) : Prop where
+  smooth : ∀ i j, ContDiff ℝ ∞ fun x => g x i j
+  posDef : ∀ x, (g x).PosDef
+  euclidean_exterior : ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
+
+/-- `Φ` is a diffeomorphism of `ℝ³` that is the identity outside the open unit ball
+and pulls `g₁` back to `g₂`, i.e. `g₂ = Φ^* g₁`. -/
+structure IsIsometryFixingExterior (Φ : R3 ≃ R3) (g₁ g₂ : MatrixField) : Prop where
+  smooth : ContDiff ℝ ∞ Φ
+  smooth_inv : ContDiff ℝ ∞ Φ.symm
+  fixes_exterior : ∀ x : R3, 1 ≤ ‖x‖ → Φ x = x
+  isometry : ∀ x : R3, g₂ x = (D Φ x).transpose * g₁ (Φ x) * D Φ x
 
 /-- Main theorem: equal Dirichlet-to-Neumann data on the whole boundary implies that
 the metrics agree up to a diffeomorphism fixing the boundary. Because both metrics
