@@ -26,14 +26,14 @@ quadratic forms `E_{g₁} = E_{g₂}` determine `Λ_{g₁} = Λ_{g₂}`.
 abbrev R3 := EuclideanSpace ℝ (Fin 3)
 
 /-- The open unit ball `B`. -/
-def ball : Set R3 := Metric.ball 0 1
+def M : Set R3 := Metric.ball 0 1
 
 /-- Partial derivative `∂ᵢu(x)` in Cartesian coordinates. -/
-def partialDeriv (u : R3 → ℝ) (i : Fin 3) (x : R3) : ℝ :=
+def d (u : R3 → ℝ) (i : Fin 3) (x : R3) : ℝ :=
   fderiv ℝ u x (EuclideanSpace.single i 1)
 
 /-- Jacobian matrix `(DΦ(x))_{ij} = ∂ⱼΦⁱ(x)`. -/
-def jacobian (Φ : R3 → R3) (x : R3) : Matrix (Fin 3) (Fin 3) ℝ :=
+def D (Φ : R3 → R3) (x : R3) : Matrix (Fin 3) (Fin 3) ℝ :=
   Matrix.of fun i j => fderiv ℝ Φ x (EuclideanSpace.single j 1) i
 
 /-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
@@ -43,19 +43,17 @@ def IsAdmissibleMetric (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) : Prop :=
   (∀ x, (g x).PosDef) ∧
   ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
 
-/-- Dirichlet energy `∫_B |du|²_g dV_g = ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx`. -/
-def energy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (u : R3 → ℝ) : ℝ :=
-  ∫ x in ball, (∑ i, ∑ j, (g x)⁻¹ i j * partialDeriv u i x * partialDeriv u j x) *
-    Real.sqrt (g x).det
+/-- Volume form √(det g) -/
+def volume (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (x : R3) : ℝ :=
+  Real.sqrt (g x).det
 
-/-- Smooth competitors with the same boundary values as `f` on `∂B`:
-`u - f` is smooth and compactly supported in the open ball. -/
-def competitors (f : R3 → ℝ) : Set (R3 → ℝ) :=
-  { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ ball }
+/-- Dirichlet energy `∫_B |du|²_g dV_g = ∫_B g^{ij} ∂ᵢu ∂ⱼu  dx`. -/
+def energy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (u : R3 → ℝ) : ℝ :=
+  ∫ x in M, (∑ i, ∑ j, (g x)⁻¹ i j * d u i x * d u j x) * volume g x
 
 /-- Minimal Dirichlet energy with boundary value `f|_{∂B}`, i.e. `⟨Λ_g f, f⟩`. -/
 def dirichletEnergy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (f : R3 → ℝ) : ℝ :=
-  sInf (energy g '' competitors f)
+  sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ M })
 
 /-- Main theorem: equal Dirichlet-to-Neumann data on the whole boundary implies that
 the metrics agree up to a diffeomorphism fixing the boundary. Because both metrics
@@ -68,7 +66,7 @@ theorem main (g₁ g₂ : R3 → Matrix (Fin 3) (Fin 3) ℝ)
     ∃ Φ : R3 ≃ R3,
       ContDiff ℝ ∞ Φ ∧ ContDiff ℝ ∞ Φ.symm ∧
       (∀ x : R3, 1 ≤ ‖x‖ → Φ x = x) ∧
-      ∀ x : R3, g₂ x = (jacobian Φ x).transpose * g₁ (Φ x) * jacobian Φ x := by
+      ∀ x : R3, g₂ x = (D Φ x).transpose * g₁ (Φ x) * D Φ x := by
   sorry
 
 end AnisotropicCalderon
