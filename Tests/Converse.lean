@@ -119,7 +119,14 @@ lemma energy_comp {u : R3 → ℝ} (hu : Differentiable ℝ u) :
 end
 
 /-- Converse of `OAI.AnisotropicCalderon.main`: if `g₂ = Φ^* g₁` for a diffeomorphism `Φ`
-that is the identity outside the unit ball, then the minimal Dirichlet energies agree. -/
+that is the identity outside the unit ball, then the minimal Dirichlet energies agree.
+
+Unlike the hypothesis `hΛ` of `main`, this does not assume that `f` is smooth. None is
+needed: `u ↦ u ∘ Φ` is a bijection between the competitor sets of `f` for `g₁` and `g₂`
+whatever `f` is, because `Φ` fixes the region `1 ≤ ‖x‖` where competitors must agree
+with `f`. For non-smooth `f` the competitor set may be empty, and then both sides are
+the junk value `sInf ∅ = 0`. Since smooth `f` are a special case, the converse in
+particular gives the hypothesis `hΛ` of `main`. -/
 theorem converse (g₁ g₂ : MatrixField) (Φ : R3 ≃ R3) (hΦ : IsIsometryFixingExterior Φ g₁ g₂)
     (f : R3 → ℝ) : minimalEnergy g₁ f = minimalEnergy g₂ f := by
   have hfix : ∀ x : R3, 1 ≤ ‖x‖ → Φ.symm x = x := fun x hx => by
