@@ -42,10 +42,18 @@ def D (Φ : R3 → R3) : MatrixField :=
 
 /-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
 outside the open unit ball. -/
-def IsAdmissibleMetric (g : MatrixField) : Prop :=
-  (∀ i j, ContDiff ℝ ∞ fun x => g x i j) ∧
-  (∀ x, (g x).PosDef) ∧
-  ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
+structure IsAdmissibleMetric (g : MatrixField) : Prop where
+  smooth : ∀ i j, ContDiff ℝ ∞ fun x => g x i j
+  posDef : ∀ x, (g x).PosDef
+  euclidean_exterior : ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
+
+/-- `Φ` is a diffeomorphism of `ℝ³` that is the identity outside the open unit ball
+and pulls `g₁` back to `g₂`, i.e. `g₂ = Φ^* g₁`. -/
+structure IsIsometryFixingExterior (Φ : R3 ≃ R3) (g₁ g₂ : MatrixField) : Prop where
+  smooth : ContDiff ℝ ∞ Φ
+  smooth_symm : ContDiff ℝ ∞ Φ.symm
+  fixes_exterior : ∀ x : R3, 1 ≤ ‖x‖ → Φ x = x
+  pullback : ∀ x : R3, g₂ x = (D Φ x).transpose * g₁ (Φ x) * D Φ x
 
 /-- Riemannian volume density `V = √(det g)`. -/
 def vol (g : MatrixField) (x : R3) : ℝ :=
@@ -67,10 +75,7 @@ diffeomorphism of `ℝ³`. -/
 theorem main (g₁ g₂ : MatrixField)
     (hg₁ : IsAdmissibleMetric g₁) (hg₂ : IsAdmissibleMetric g₂)
     (hΛ : ∀ f : R3 → ℝ, ContDiff ℝ ∞ f → minimalEnergy g₁ f = minimalEnergy g₂ f) :
-    ∃ Φ : R3 ≃ R3,
-      ContDiff ℝ ∞ Φ ∧ ContDiff ℝ ∞ Φ.symm ∧
-      (∀ x : R3, 1 ≤ ‖x‖ → Φ x = x) ∧
-      ∀ x : R3, g₂ x = (D Φ x).transpose * g₁ (Φ x) * D Φ x := by
+    ∃ Φ : R3 ≃ R3, IsIsometryFixingExterior Φ g₁ g₂ := by
   sorry
 
 end AnisotropicCalderon
