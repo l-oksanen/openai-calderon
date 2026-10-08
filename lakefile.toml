@@ -1,5 +1,8 @@
 name = "openai_calderon"
 defaultTargets = ["ComparatorChallenges", "Tests"]
+# The challenge files are plain (non-`module`) Lean files; silence the warning that
+# Mathlib is designed for use with the module system.
+allowNonModules = true
 
 [leanOptions]
 autoImplicit = false
