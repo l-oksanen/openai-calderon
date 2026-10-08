@@ -28,31 +28,34 @@ abbrev R3 := EuclideanSpace ℝ (Fin 3)
 /-- The open unit ball `B`. -/
 def M : Set R3 := Metric.ball 0 1
 
-/-- Partial derivative `∂ᵢu(x)` in Cartesian coordinates. -/
-def d (u : R3 → ℝ) (i : Fin 3) (x : R3) : ℝ :=
-  fderiv ℝ u x (EuclideanSpace.single i 1)
+/-- Fields of `3 × 3` matrices on `ℝ³`, such as metrics and Jacobians. -/
+abbrev MatrixField := R3 → Matrix (Fin 3) (Fin 3) ℝ
 
-/-- Jacobian matrix `(DΦ(x))_{ij} = ∂ⱼΦⁱ(x)`. -/
-def D (Φ : R3 → R3) (x : R3) : Matrix (Fin 3) (Fin 3) ℝ :=
-  Matrix.of fun i j => fderiv ℝ Φ x (EuclideanSpace.single j 1) i
+/-- Differential `du(x)` in Cartesian coordinates, `d u x i = ∂ᵢu(x)`. -/
+def d (u : R3 → ℝ) (x : R3) : Fin 3 → ℝ :=
+  fun i => fderiv ℝ u x (EuclideanSpace.single i 1)
+
+/-- Jacobian matrix, `D Φ x i j = ∂ⱼΦⁱ(x)`. -/
+def D (Φ : R3 → R3) : MatrixField :=
+  fun x => Matrix.of fun i j => fderiv ℝ Φ x (EuclideanSpace.single j 1) i
 
 /-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
 outside the open unit ball. -/
-def IsAdmissibleMetric (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) : Prop :=
+def IsAdmissibleMetric (g : MatrixField) : Prop :=
   (∀ i j, ContDiff ℝ ∞ fun x => g x i j) ∧
   (∀ x, (g x).PosDef) ∧
   ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
 
-/-- Volume form √(det g) -/
-def volume (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (x : R3) : ℝ :=
+/-- Riemannian volume density `√(det g)`. -/
+def volume (g : MatrixField) (x : R3) : ℝ :=
   Real.sqrt (g x).det
 
-/-- Dirichlet energy `∫_B |du|²_g dV_g = ∫_B g^{ij} ∂ᵢu ∂ⱼu  dx`. -/
-def energy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (u : R3 → ℝ) : ℝ :=
-  ∫ x in M, (∑ i, ∑ j, (g x)⁻¹ i j * d u i x * d u j x) * volume g x
+/-- Dirichlet energy `∫_B |du|²_g dV_g = ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx`. -/
+def energy (g : MatrixField) (u : R3 → ℝ) : ℝ :=
+  ∫ x in M, (∑ i, ∑ j, (g x)⁻¹ i j * d u x i * d u x j) * volume g x
 
 /-- Minimal Dirichlet energy with boundary value `f|_{∂B}`, i.e. `⟨Λ_g f, f⟩`. -/
-def dirichletEnergy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (f : R3 → ℝ) : ℝ :=
+def dirichletEnergy (g : MatrixField) (f : R3 → ℝ) : ℝ :=
   sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ M })
 
 /-- Main theorem: equal Dirichlet-to-Neumann data on the whole boundary implies that
@@ -60,7 +63,7 @@ the metrics agree up to a diffeomorphism fixing the boundary. Because both metri
 agree with the Euclidean metric to infinite order at `∂B`, the diffeomorphism agrees
 with the identity to infinite order at `∂B`, so it extends by the identity to a
 diffeomorphism of `ℝ³`. -/
-theorem main (g₁ g₂ : R3 → Matrix (Fin 3) (Fin 3) ℝ)
+theorem main (g₁ g₂ : MatrixField)
     (hg₁ : IsAdmissibleMetric g₁) (hg₂ : IsAdmissibleMetric g₂)
     (hΛ : ∀ f : R3 → ℝ, ContDiff ℝ ∞ f → dirichletEnergy g₁ f = dirichletEnergy g₂ f) :
     ∃ Φ : R3 ≃ R3,
