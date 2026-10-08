@@ -10,12 +10,11 @@ namespace AnisotropicCalderon
 
 /-!
 Smooth anisotropic Calderón uniqueness, specialized to `n = 3`, `M` the closed
-unit ball `B ⊆ ℝ³`, `Γ = ∂B`, and metrics that are Euclidean outside a ball of
-radius `1 - ε`.
+unit ball `B ⊆ ℝ³`, `Γ = ∂B`, and metrics that are Euclidean outside `B`.
 
-A metric is a matrix-valued function `g : ℝ³ → ℝ³ˣ³` in Cartesian coordinates.
-Since it equals the identity near `∂B`, it extends by the identity to a smooth
-metric on all of `ℝ³`; we state everything for such extensions.
+A metric is a smooth matrix-valued function `g : ℝ³ → ℝ³ˣ³` in Cartesian
+coordinates, equal to the identity on `ℝ³ ∖ B`. Its restriction to the closed
+ball is a smooth metric on `M`.
 
 The full-boundary Dirichlet-to-Neumann data is encoded by the minimal Dirichlet
 energy `E_g(f) = inf { ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx : u smooth, u - f ∈ C_c^∞(B) }`
@@ -38,11 +37,11 @@ def jacobian (Φ : R3 → R3) (x : R3) : Matrix (Fin 3) (Fin 3) ℝ :=
   Matrix.of fun i j => fderiv ℝ Φ x (EuclideanSpace.single j 1) i
 
 /-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
-outside the ball of radius `1 - ε` for some `ε > 0`. -/
+outside the open unit ball. -/
 def IsAdmissibleMetric (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) : Prop :=
   (∀ i j, ContDiff ℝ ∞ fun x => g x i j) ∧
   (∀ x, (g x).PosDef) ∧
-  ∃ ε : ℝ, 0 < ε ∧ ∀ x : R3, 1 - ε < ‖x‖ → g x = 1
+  ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
 
 /-- Dirichlet energy `∫_B |du|²_g dV_g = ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx`. -/
 def energy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (u : R3 → ℝ) : ℝ :=
@@ -59,9 +58,10 @@ def dirichletEnergy (g : R3 → Matrix (Fin 3) (Fin 3) ℝ) (f : R3 → ℝ) : �
   sInf (energy g '' competitors f)
 
 /-- Main theorem: equal Dirichlet-to-Neumann data on the whole boundary implies that
-the metrics agree up to a diffeomorphism fixing the boundary. Because both metrics are
-Euclidean near `∂B`, the diffeomorphism is the identity near `∂B`, so it extends by
-the identity to a diffeomorphism of `ℝ³`. -/
+the metrics agree up to a diffeomorphism fixing the boundary. Because both metrics
+agree with the Euclidean metric to infinite order at `∂B`, the diffeomorphism agrees
+with the identity to infinite order at `∂B`, so it extends by the identity to a
+diffeomorphism of `ℝ³`. -/
 theorem main (g₁ g₂ : R3 → Matrix (Fin 3) (Fin 3) ℝ)
     (hg₁ : IsAdmissibleMetric g₁) (hg₂ : IsAdmissibleMetric g₂)
     (hΛ : ∀ f : R3 → ℝ, ContDiff ℝ ∞ f → dirichletEnergy g₁ f = dirichletEnergy g₂ f) :
