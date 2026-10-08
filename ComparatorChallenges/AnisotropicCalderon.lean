@@ -9,8 +9,9 @@ open scoped ContDiff
 namespace AnisotropicCalderon
 
 /-!
-Smooth anisotropic Calderón uniqueness, specialized to `n = 3`, `M` the open
-unit ball `B ⊆ ℝ³`, `Γ = ∂B`, and metrics that are Euclidean outside `B`.
+Smooth anisotropic Calderón uniqueness, specialized to `n = 3`, `M` the closed
+unit ball `B̄`, where `B ⊆ ℝ³` is the open unit ball, `Γ = ∂B`, and metrics that are
+Euclidean outside `B`.
 
 A metric is a smooth matrix-valued function `g : ℝ³ → ℝ³ˣ³` in Cartesian
 coordinates, equal to the identity on `ℝ³ ∖ B`. Its restriction to the closed
