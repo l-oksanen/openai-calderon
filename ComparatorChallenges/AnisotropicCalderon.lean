@@ -9,7 +9,7 @@ open scoped ContDiff
 namespace AnisotropicCalderon
 
 /-!
-Smooth anisotropic Calderón uniqueness, specialized to `n = 3`, `M` the closed
+Smooth anisotropic Calderón uniqueness, specialized to `n = 3`, `M` the open
 unit ball `B ⊆ ℝ³`, `Γ = ∂B`, and metrics that are Euclidean outside `B`.
 
 A metric is a smooth matrix-valued function `g : ℝ³ → ℝ³ˣ³` in Cartesian
@@ -23,13 +23,14 @@ of each smooth boundary value `f|_{∂B}`. This infimum equals
 quadratic forms `E_{g₁} = E_{g₂}` determine `Λ_{g₁} = Λ_{g₂}`.
 -/
 
+/-- The Euclidean space `ℝ³`. -/
 abbrev R3 := EuclideanSpace ℝ (Fin 3)
-
-/-- The open unit ball `B`. -/
-def M : Set R3 := Metric.ball 0 1
 
 /-- Fields of `3 × 3` matrices on `ℝ³`, such as metrics and Jacobians. -/
 abbrev MatrixField := R3 → Matrix (Fin 3) (Fin 3) ℝ
+
+/-- The open unit ball. -/
+def B : Set R3 := Metric.ball 0 1
 
 /-- Differential `du(x)` in Cartesian coordinates, `d u x i = ∂ᵢu(x)`. -/
 def d (u : R3 → ℝ) (x : R3) : Fin 3 → ℝ :=
@@ -46,17 +47,17 @@ def IsAdmissibleMetric (g : MatrixField) : Prop :=
   (∀ x, (g x).PosDef) ∧
   ∀ x : R3, 1 ≤ ‖x‖ → g x = 1
 
-/-- Riemannian volume density `√(det g)`. -/
-def volume (g : MatrixField) (x : R3) : ℝ :=
+/-- Riemannian volume density `V = √(det g)`. -/
+def vol (g : MatrixField) (x : R3) : ℝ :=
   Real.sqrt (g x).det
 
-/-- Dirichlet energy `∫_B |du|²_g dV_g = ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx`. -/
+/-- Dirichlet energy `∫_B |du|²_g dV = ∫_B g^{ij} ∂ᵢu ∂ⱼu dV`. -/
 def energy (g : MatrixField) (u : R3 → ℝ) : ℝ :=
-  ∫ x in M, (∑ i, ∑ j, (g x)⁻¹ i j * d u x i * d u x j) * volume g x
+  ∫ x in B, (∑ i, ∑ j, (g x)⁻¹ i j * d u x i * d u x j) * vol g x
 
 /-- Minimal Dirichlet energy with boundary value `f|_{∂B}`, i.e. `⟨Λ_g f, f⟩`. -/
 def dirichletEnergy (g : MatrixField) (f : R3 → ℝ) : ℝ :=
-  sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ M })
+  sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ B })
 
 /-- Main theorem: equal Dirichlet-to-Neumann data on the whole boundary implies that
 the metrics agree up to a diffeomorphism fixing the boundary. Because both metrics
