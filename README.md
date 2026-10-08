@@ -8,3 +8,5 @@ ball.
 
 - Statement: `ComparatorChallenges/AnisotropicCalderon.lean`
 - Comparator config: `ComparatorChallenges/AnisotropicCalderon.json`
+- Converse (proved, no `sorry`): `Tests/Converse.lean` shows that metrics related as in
+  the conclusion of `main` have equal minimal Dirichlet energies for every `f`

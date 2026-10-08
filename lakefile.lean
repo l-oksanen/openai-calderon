@@ -10,3 +10,7 @@ require mathlib from git
 @[default_target]
 lean_lib ComparatorChallenges where
   globs := #[.submodules `ComparatorChallenges]
+
+@[default_target]
+lean_lib Tests where
+  globs := #[.submodules `Tests]

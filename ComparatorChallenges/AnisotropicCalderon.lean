@@ -18,8 +18,9 @@ coordinates, equal to the identity on `ℝ³ ∖ B`. Its restriction to the clos
 ball is a smooth metric on `M`.
 
 The full-boundary Dirichlet-to-Neumann data is encoded by the minimal Dirichlet
-energy `E_g(f) = inf { ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx : u smooth, u - f ∈ C_c^∞(B) }`
-of each smooth boundary value `f|_{∂B}`. This infimum equals
+energy `E_g(f) = inf { ∫_B g^{ij} ∂ᵢu ∂ⱼu √(det g) dx : u smooth, u = f on ℝ³ ∖ B }`
+of each smooth boundary value `f|_{∂B}`. Since such `u - f` vanish on `∂B` and
+include `C_c^∞(B)`, which is dense in `H¹₀(B)`, this infimum equals
 `⟨Λ_g f, f⟩ = ∫_B |d u_f^g|²_g dV_g`, and by polarization and density the
 quadratic forms `E_{g₁} = E_{g₂}` determine `Λ_{g₁} = Λ_{g₂}`.
 -/
@@ -51,7 +52,7 @@ def energy (g : MatrixField) (u : R3 → ℝ) : ℝ :=
 
 /-- Minimal Dirichlet energy with boundary value `f|_{∂B}`, i.e. `⟨Λ_g f, f⟩`. -/
 def minimalEnergy (g : MatrixField) (f : R3 → ℝ) : ℝ :=
-  sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ tsupport (u - f) ⊆ B })
+  sInf (energy g '' { u | ContDiff ℝ ∞ u ∧ ∀ x : R3, 1 ≤ ‖x‖ → u x = f x })
 
 /-- `g` is a smooth Riemannian metric on `ℝ³` equal to the Euclidean metric
 outside the open unit ball. -/
